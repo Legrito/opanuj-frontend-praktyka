@@ -11,6 +11,7 @@ import { commentsReducer } from '../reducers/commentsReducer';
 import {
   QueryClient,
   QueryClientProvider,
+  useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
@@ -23,6 +24,15 @@ function useAuthorsQuery(authorsAPI: string) {
       const response = await axios.get<{ authors: Author[] }>(authorsAPI);
       return response.data.authors;
     },
+  });
+}
+
+function useAddCommentMutation(commentAPI: string) {
+  return useMutation({
+    mutationFn: async (comment: { comment: string; rating: string }) => {
+      return await axios.post(commentAPI, comment);
+    },
+    onError: (error) => console.log('ERROR:', error),
   });
 }
 
@@ -60,9 +70,17 @@ function Comments() {
       {comments.length === 0 && <Placeholder lines={3} height={16} />}
       {comments.map((comment) => (
         <div
-          className="bg-violet-400 rounded-xl text-white p-4 mb-2 shadow"
+          className="bg-violet-400 rounded-xl text-white p-4 mb-2 shadow relative"
           key={comment.id}
         >
+          {comment.isError && comment.onReset && (
+            <button
+              className="absolute right-2 top-2 px-3 py-2 text-xs font-medium text-center text-white bg-purple-700 rounded-lg hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
+              onClick={comment.onReset}
+            >
+              Re-send
+            </button>
+          )}
           <p className="italic">"{comment.text}"</p>
           <p className="text-sm text-violet-900">
             {comment.author} - Rating {comment.rating}/5
@@ -84,6 +102,7 @@ function CommentsForm({
   const { commentsAPI } = useLoaderData() as Bootstrap;
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState('');
+  const { mutate, reset, isPending } = useAddCommentMutation(commentsAPI);
 
   function storeNewComment(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -96,16 +115,32 @@ function CommentsForm({
         rating: parseInt(newRating, 10),
       },
     });
-    setNewComment('');
-    setNewRating('');
-    axios
-      .post(commentsAPI, {
+
+    mutate(
+      {
         comment: newComment,
         rating: newRating,
-      })
-      .catch(() => {
-        // Rollback the comment if the request fails
-      });
+      },
+      {
+        onSuccess: () => {
+          setNewComment('');
+          setNewRating('');
+        },
+        onError: () => {
+          dispatch({
+            type: 'UPDATE_COMMENT',
+            payload: {
+              id: comments.length + 1,
+              text: newComment,
+              author: 'John Doe',
+              rating: parseInt(newRating, 10),
+              onReset: () => reset(),
+              isError: true,
+            },
+          });
+        },
+      }
+    );
   }
 
   return (
@@ -129,7 +164,7 @@ function CommentsForm({
             />
           </div>
           <button className="bg-violet-400 text-white p-2 rounded-lg mt-2">
-            Submit
+            {isPending ? 'Submitting' : 'Submit'}
           </button>
         </form>
       )}

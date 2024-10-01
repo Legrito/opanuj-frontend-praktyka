@@ -1,7 +1,8 @@
+import { FC } from 'react';
 import { Article } from './types';
 import { useArticlesClient } from './useArticlesClient';
 
-export function ArticlesList() {
+export const ArticlesList: FC = () => {
   const { articles, loading, error } = useArticlesClient();
 
   return (
