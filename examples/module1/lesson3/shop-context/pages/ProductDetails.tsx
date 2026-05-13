@@ -1,11 +1,11 @@
-import { useContext } from 'react';
+import { memo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { ProductContext } from '../contexts/ProductContext';
+import { Product } from '../types/Product';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const { addToCart } = useContext(CartContext);
   const { products } = useContext(ProductContext);
 
   const product = products.find((item) => {
@@ -36,12 +36,13 @@ const ProductDetails = () => {
               $ {price}
             </div>
             <p className="mb-8">{description}</p>
-            <button
+            {!!product && <AddToCartButton product={product} />}
+            {/* <button
               onClick={() => addToCart(product)}
               className="bg-green-600 py-4 px-8 text-white"
             >
               Add to cart
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -50,3 +51,18 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+const AddToCartButton = memo(({ product }: { product: Product }) => {
+  const { addToCart } = useContext(CartContext);
+
+  const handleAddToCart = () => addToCart(product);
+
+  return (
+    <button
+      onClick={handleAddToCart}
+      className="bg-green-600 py-4 px-8 text-white"
+    >
+      Add to cart
+    </button>
+  );
+});

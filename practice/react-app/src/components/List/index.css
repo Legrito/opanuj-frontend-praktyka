@@ -1,0 +1,35 @@
+.element {
+  animation: shadow 2s infinite;
+  transform-origin: left top;
+}
+
+
+@keyframes shadow {
+  0% {
+    filter: drop-shadow(2px 3px 7px rgba(0, 0, 0, .7));
+    transform: rotateX(0deg) matrix3d(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+    );
+  }
+  50% {
+    filter: drop-shadow(3px 3px 16px rgba(0, 0, 0, .5));
+    transform: rotateX(10deg) matrix3d(
+            0.9829214561476214, 0, 0, -0.00003271751695857963,
+            0, 0.9962483913887495, 0, -0.000021811677972386414,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+    );
+  }
+  100% {
+    filter: drop-shadow(2px 3px 7px rgba(0, 0, 0, .7));
+    transform: rotateX(0deg) matrix3d(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+    );
+  }
+}

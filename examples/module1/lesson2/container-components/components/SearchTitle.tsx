@@ -1,5 +1,9 @@
-function SearchTitle() {
-  return <h1 className="text-2xl">Wyszukiwarka postaci Rick and Morty</h1>;
+interface Props { 
+  title?: string
+}
+
+function SearchTitle({ title= 'Wyszukiwarka postaci Rick and Morty'}: Props) {
+  return <h1 className="text-2xl">{title}</h1>;
 }
 
 export default SearchTitle;

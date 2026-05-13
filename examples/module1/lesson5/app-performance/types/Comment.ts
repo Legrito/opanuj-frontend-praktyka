@@ -3,4 +3,6 @@ export interface Comment {
   author: string;
   text: string;
   rating: number;
+  onReset?: () => void;
+  isError?: boolean;
 }
